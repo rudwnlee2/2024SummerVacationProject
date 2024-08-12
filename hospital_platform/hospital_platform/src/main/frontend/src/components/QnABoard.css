@@ -1,0 +1,36 @@
+.qna-board {
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.qna-board h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.qa-items {
+    display: flex;
+    justify-content: space-between;
+}
+
+.qa-item {
+    width: 45%;
+}
+
+.qa-item h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.qa-item small {
+    font-size: 14px;
+    color: #333;
+}
+
+.qa-item ul {
+    padding-left: 20px;
+}
+
+.qa-item li {
+    margin-bottom: 5px;
+}

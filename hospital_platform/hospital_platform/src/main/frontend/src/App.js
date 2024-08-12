@@ -28,16 +28,33 @@ export default App;
 
 */
 
-// App.js
-
+// src/App.js
 import React from 'react';
+import HeroSection from './components/HeroSection';
+import TreatmentInfo from './components/TreatmentInfo';
 import AppointmentFeatures from './components/AppointmentFeatures';
-import './App.css'; // 기본 App 스타일이 필요한 경우
+import TreatmentHistory from './components/TreatmentHistory';
+import FeeCalculator from './components/FeeCalculator';
+import ConsultationFeature from './components/ConsultationFeature';
+import CommunityBoard from './components/CommunityBoard';
+import ReviewSharing from './components/ReviewSharing';
+import QnABoard from './components/QnABoard';
+import EventsPromotion from './components/EventsPromotion';
+import './App.css';
 
 function App() {
     return (
         <div className="App">
+            <HeroSection />
+            <TreatmentInfo />
             <AppointmentFeatures />
+            <TreatmentHistory />
+            <FeeCalculator />
+            <ConsultationFeature />
+            <CommunityBoard />
+            <ReviewSharing />
+            <QnABoard />
+            <EventsPromotion />
         </div>
     );
 }
