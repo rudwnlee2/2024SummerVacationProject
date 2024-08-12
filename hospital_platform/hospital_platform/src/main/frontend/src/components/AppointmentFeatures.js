@@ -38,6 +38,7 @@ export default AppointmentFeatures;
 // src/components/AppointmentFeatures.js
 import React from 'react';
 import './AppointmentFeatures.css';
+import {Link} from "react-router-dom";
 
 function AppointmentFeatures() {
     return (

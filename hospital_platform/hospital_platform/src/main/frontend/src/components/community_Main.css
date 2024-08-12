@@ -1,0 +1,57 @@
+.community-container {
+    width: 40%;
+    margin: 0 auto;
+}
+
+.community-header {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.community-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #212529;
+}
+
+.user-info {
+    color: #868e96;
+    font-size: 16px;
+}
+
+.main-content {
+    margin-top: 8px;
+    font-size: 18px;
+    color: #495057;
+}
+
+.image-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.image-placeholder {
+    background-color: #dee2e6;
+    width: 18%;
+    height: 100px;
+}
+
+.buttons-container {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.like-button, .comment-button, .tag-button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.comment-button {
+    margin-right: 10px;
+}

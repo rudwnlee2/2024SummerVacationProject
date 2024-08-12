@@ -30,6 +30,7 @@ export default App;
 
 // src/App.js
 import React from 'react';
+import { Routes, Route } from "react-router-dom";
 import HeroSection from './components/HeroSection';
 import TreatmentInfo from './components/TreatmentInfo';
 import AppointmentFeatures from './components/AppointmentFeatures';
@@ -44,18 +45,18 @@ import './App.css';
 
 function App() {
     return (
-        <div className="App">
-            <HeroSection />
-            <TreatmentInfo />
-            <AppointmentFeatures />
-            <TreatmentHistory />
-            <FeeCalculator />
-            <ConsultationFeature />
-            <CommunityBoard />
-            <ReviewSharing />
-            <QnABoard />
-            <EventsPromotion />
-        </div>
+        <Routes>
+            <Route path="/HeroSection" element={<HeroSection />} />
+            <Route path="/TreatmentInfo" element={<TreatmentInfo />} />
+            <Route path="/AppointmentFeatures" element={<AppointmentFeatures />} />
+            <Route path="/TreatmentHistory" element={<TreatmentHistory />} />
+            <Route path="/FeeCalculator" element={<FeeCalculator />} />
+            <Route path="/ConsultationFeature" element={<ConsultationFeature />} />
+            <Route path="/CommunityBoard" element={<CommunityBoard />} />
+            <Route path="/ReviewSharing" element={<ReviewSharing />} />
+            <Route path="/QnABoard" element={<QnABoard />} />
+            <Route path="/EventsPromotion" element={<EventsPromotion />} />
+        </Routes>
     );
 }
 
