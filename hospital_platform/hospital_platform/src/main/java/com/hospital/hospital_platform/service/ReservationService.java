@@ -24,6 +24,4 @@ public class ReservationService {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);
         return reservation.orElse(null); // Optional에서 값을 추출하여 반환, 없으면 null 반환
     }
-
-
 }
