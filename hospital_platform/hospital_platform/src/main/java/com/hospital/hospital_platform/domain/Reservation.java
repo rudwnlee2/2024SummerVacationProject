@@ -2,18 +2,17 @@ package com.hospital.hospital_platform.domain;
 
 import com.hospital.hospital_platform.domain.hospital.Hospital;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity //JPA 엔티티 선언
-@NoArgsConstructor //기본생성자 생성 꼭 필요(데이터베이스에서 데이터를 조회할 때 기본 생성자를 통해 객체를 생성)  lombok을 이용해서 간단하게 함
+@NoArgsConstructor //빌더랑 같이사용할 수 없음 
+//@AllArgsConstructor //빌더를 쓰려면 전체생성자를 만들어야하는데 우리는 아이디가 자동생성이므로 빌더를 따로 빼서 사용
 @Getter
-@Setter //getter setter 원래는 setter를 빼야함
+//@Setter //getter setter 원래는 setter를 빼야함
 public class Reservation {
 
     @Id //pk
@@ -30,5 +29,12 @@ public class Reservation {
     private User user;
 
     private LocalDateTime reservationDate;
+
+    @Builder
+    public Reservation(Hospital hospital, User user, LocalDateTime reservationDate) {
+        this.hospital = hospital;
+        this.user = user;
+        this.reservationDate = reservationDate;
+    }
 
 }
