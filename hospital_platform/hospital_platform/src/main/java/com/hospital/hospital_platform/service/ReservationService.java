@@ -35,9 +35,16 @@ public class ReservationService {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new IllegalArgumentException("Hospital not found"));
 
-        // 예약날짜
+        // 예약날짜 생성
         LocalDateTime day = LocalDateTime.of(reservationDate.getYear(), reservationDate.getMonth(),
                 reservationDate.getDayOfMonth(), reservationDate.getHour(), reservationDate.getMinute());
+
+        // 예약 시간 중복 체크
+        List<Reservation> existingReservations = reservationRepository.findByHospitalIdAndReservationDate(hospitalId, day);
+
+        if (!existingReservations.isEmpty()) {
+            throw new IllegalStateException("이미 예약된 시간입니다.");
+        }
 
         // 예약생성
         Reservation reservation = Reservation.builder()
@@ -48,11 +55,18 @@ public class ReservationService {
 
         //예약 저장
         reservationRepository.save(reservation);
-
         return reservation.getId();
     }
 
-    public List<Reservation> findReservation() { //이것도 Optional로 바꿔야함 아마두? 널 검사
+    /**
+     *예약취소
+     */
+    @Transactional
+    public void cancelReservation(Long reservationId) {
+        reservationRepository.deleteById(reservationId);
+    }
+
+    public List<Reservation> findReservation() {
         return reservationRepository.findAll();
     }
 
