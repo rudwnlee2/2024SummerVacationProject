@@ -1,34 +1,3 @@
-/*
-
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo"/>
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-);
-}
-
-export default App;
-
-*/
-
-// src/App.js
 import React from 'react';
 import { Routes, Route } from "react-router-dom";
 import HeroSection from './components/HeroSection';
@@ -41,6 +10,8 @@ import CommunityBoard from './components/CommunityBoard';
 import ReviewSharing from './components/ReviewSharing';
 import QnABoard from './components/QnABoard';
 import EventsPromotion from './components/EventsPromotion';
+import CommunityPage from './components/CommunityPage';
+import DentistList from './components/DentistList';
 import './App.css';
 
 function App() {
@@ -56,6 +27,8 @@ function App() {
             <Route path="/ReviewSharing" element={<ReviewSharing />} />
             <Route path="/QnABoard" element={<QnABoard />} />
             <Route path="/EventsPromotion" element={<EventsPromotion />} />
+            <Route path="/Community" element={<CommunityPage />} />
+            <Route path="/Dentistlist" element={<DentistList />} />
         </Routes>
     );
 }

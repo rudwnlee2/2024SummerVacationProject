@@ -1,32 +1,51 @@
-import React from 'react';
-import './CommunityBoard.css';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Post from './Post';
 
-const CommunityBoard = () => (
-    <div className="community-board">
-        <h2>커뮤니티 게시판</h2>
-        <div className="icons">
-            <div>
-                <span>💬</span>
-                <p>대화하기</p>
-                <small>다른 환자들과 자유롭게 소통하며 정보를 공유할 수 있습니다.</small>
-            </div>
-            <div>
-                <span>❓</span>
-                <p>질문하기</p>
-                <small>치과 관련 궁금증을 게시판에 올려 해답을 얻을 수 있습니다.</small>
-            </div>
-            <div>
-                <span>⭐</span>
-                <p>후기 작성</p>
-                <small>진료 경험을 공유하여 다른 사람들에게 정보를 제공할 수 있습니다.</small>
-            </div>
-            <div>
-                <span>📅</span>
-                <p>이벤트 확인</p>
-                <small>치과 관련 다양한 이벤트와 프로모션 정보를 확인할 수 있습니다.</small>
+const CommunityBoard = () => {
+    const [posts, setPosts] = useState([]);
+    const [showPostForm, setShowPostForm] = useState(false);
+
+    const addPost = (newPost) => {
+        setPosts([...posts, newPost]);
+        setShowPostForm(false);
+    };
+
+    return (
+        <div style={{ padding: '20px' }}>
+            <h1>Community Board</h1>
+            <button onClick={() => setShowPostForm(true)}>Add Post</button>
+
+            {showPostForm && <Post addPost={addPost} />}
+
+            <div style={{
+                border: '1px solid black',
+                padding: '10px',
+                marginTop: '20px'
+            }}>
+                {posts.map((post, index) => (
+                    <div key={index} style={{
+                        border: '1px solid gray',
+                        padding: '10px',
+                        margin: '10px 0'
+                    }}>
+                        <h3>{post.title}</h3>
+                        <p>Author: {post.author}</p>
+                        {post.hospitalName && (
+                            <p>Hospital:
+                                <Link to={`/community?search=${encodeURIComponent(post.hospitalName)}`}
+                                      onClick={() => console.log(`/community?search=${encodeURIComponent(post.hospitalName)}`)}>
+                                    {post.hospitalName}
+                                </Link>
+                            </p>
+                        )}
+                        <p>Review: {post.isReview ? 'Yes' : 'No'}</p>
+                        <p>{post.content}</p>
+                    </div>
+                ))}
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default CommunityBoard;
