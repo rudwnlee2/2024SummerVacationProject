@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity //JPA 엔티티 선언
-@NoArgsConstructor //빌더랑 같이사용할 수 없음 
+@NoArgsConstructor //빌더랑 같이사용할 수 없음
 //@AllArgsConstructor //빌더를 쓰려면 전체생성자를 만들어야하는데 우리는 아이디가 자동생성이므로 빌더를 따로 빼서 사용
 @Getter
 //@Setter //getter setter 원래는 setter를 빼야함
@@ -32,9 +32,44 @@ public class Reservation {
 
     @Builder
     public Reservation(Hospital hospital, User user, LocalDateTime reservationDate) {
+        validateReservationDate(reservationDate);
+
         this.hospital = hospital;
         this.user = user;
         this.reservationDate = reservationDate;
+    }
+
+    //== 비즈니스 로직==//
+
+    /**
+     * 예약 변경
+     */
+    public void updateReservation(LocalDateTime updateDate) {
+        validateReservationDate(updateDate);
+        this.reservationDate = updateDate;
+    }
+
+    /**
+     * 예약날짜 감사
+     */
+    private void validateReservationDate(LocalDateTime reservationsDate) {
+        LocalDateTime now = LocalDateTime.now();
+
+        //null체크
+        if (reservationsDate == null) {
+            throw new IllegalArgumentException("날짜가 null입니다.");
+        }
+
+        //과거 날짜 체크
+        if(reservationsDate.isBefore(now)) {
+            throw new IllegalArgumentException("예약은 현재 시간 이후여야 합니다.");
+        }
+
+        //2년까지 예약 체크
+        if (reservationsDate.isAfter(now.plusYears(2))) {
+            throw new IllegalArgumentException("예약은 2년 이내로 가능합니다. ");
+        }
+
     }
 
 }

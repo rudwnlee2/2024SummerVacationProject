@@ -3,6 +3,7 @@ package com.hospital.hospital_platform.service;
 import com.hospital.hospital_platform.domain.Reservation;
 import com.hospital.hospital_platform.domain.User;
 import com.hospital.hospital_platform.domain.hospital.Hospital;
+import com.hospital.hospital_platform.dto.ReservationDTO;
 import com.hospital.hospital_platform.repository.HospitalRepository;
 import com.hospital.hospital_platform.repository.ReservationRepository;
 import com.hospital.hospital_platform.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,109 +27,126 @@ class ReservationServiceTest {
     private ReservationService reservationService;
 
     @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private HospitalRepository hospitalRepository;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    private User testUser;
-    private Hospital testHospital;
+    private User user;
+    private Hospital hospital;
+    private ReservationDTO reservationDTO;
 
     @BeforeEach
     void setUp() {
-        testUser = new User();
-        testUser.setName("Test User");
-        userRepository.save(testUser);
+        // 테스트 데이터 설정
+        user = new User();
+        // user 필드 설정
+        userRepository.save(user);
 
-        testHospital = new Hospital();
-        testHospital.setName("Test Hospital");
-        hospitalRepository.save(testHospital);
-    }
+        hospital = new Hospital();
+        // hospital 필드 설정
+        hospitalRepository.save(hospital);
 
-    @Test
-    void reservation_Success() {
-        // Given
         LocalDateTime reservationDate = LocalDateTime.now().plusDays(1);
 
-        // When
-        Long reservationId = reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate);
-
-        // Then
-        assertNotNull(reservationId);
-        Reservation savedReservation = reservationRepository.findById(reservationId).orElse(null);
-        assertNotNull(savedReservation);
-        assertEquals(testUser.getId(), savedReservation.getUser().getId());
-        assertEquals(testHospital.getId(), savedReservation.getHospital().getId());
-        assertEquals(reservationDate.withSecond(0).withNano(0), savedReservation.getReservationDate().withSecond(0).withNano(0));
+        reservationDTO = ReservationDTO.builder()
+                .userId(user.getId())
+                .hospitalId(hospital.getId())
+                .reservationDate(reservationDate)
+                .build();
     }
 
     @Test
-    void reservation_AlreadyExists() {
-        // Given
-        LocalDateTime reservationDate = LocalDateTime.now().plusDays(1);
-        reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate);
+        // 예약 생성 테스트
+    void reservationCreationTest() {
+        ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
 
-        // When & Then
-        assertThrows(IllegalStateException.class, () ->
-                reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate)
-        );
+        assertNotNull(createdReservation);
+        assertEquals(user.getId(), createdReservation.getUserId());
+        assertEquals(hospital.getId(), createdReservation.getHospitalId());
+        assertEquals(reservationDTO.getReservationDate(), createdReservation.getReservationDate());
     }
 
     @Test
-    void cancelReservation() {
-        // Given
-        LocalDateTime reservationDate = LocalDateTime.now().plusDays(1);
-        Long reservationId = reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate);
+        // 존재하지 않는 사용자로 예약 생성 시 예외 발생 테스트
+    void reservationWithNonExistentUserTest() {
+        ReservationDTO invalidDTO = ReservationDTO.builder()
+                .userId(9999L) // 존재하지 않는 사용자 ID
+                .hospitalId(hospital.getId())
+                .reservationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
-        // When
-        reservationService.cancelReservation(reservationId);
-
-        // Then
-        assertNull(reservationRepository.findById(reservationId).orElse(null));
+        assertThrows(IllegalArgumentException.class, () -> reservationService.reservation(invalidDTO));
     }
 
     @Test
-    void findReservation() {
-        // Given
-        LocalDateTime reservationDate1 = LocalDateTime.now().plusDays(1);
-        LocalDateTime reservationDate2 = LocalDateTime.now().plusDays(2);
-        reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate1);
-        reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate2);
+        // 존재하지 않는 병원으로 예약 생성 시 예외 발생 테스트
+    void reservationWithNonExistentHospitalTest() {
+        ReservationDTO invalidDTO = ReservationDTO.builder()
+                .userId(user.getId())
+                .hospitalId(9999L) // 존재하지 않는 병원 ID
+                .reservationDate(LocalDateTime.now().plusDays(1))
+                .build();
 
-        // When
-        List<Reservation> reservations = reservationService.findReservation();
+        assertThrows(IllegalArgumentException.class, () -> reservationService.reservation(invalidDTO));
+    }
 
-        // Then
+    @Test
+        // 예약 취소 테스트
+    void reservationCancellationTest() {
+        ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
+
+        reservationService.cancelReservation(createdReservation.getId());
+
+        Optional<ReservationDTO> cancelledReservation = reservationService.findOne(createdReservation.getId());
+        assertTrue(cancelledReservation.isEmpty());
+    }
+
+    @Test
+        // 존재하지 않는 예약 취소 시 예외 발생 테스트
+    void cancelNonExistentReservationTest() {
+        assertThrows(IllegalArgumentException.class, () -> reservationService.cancelReservation(9999L));
+    }
+
+    @Test
+        // 예약 날짜 변경 테스트
+    void reservationUpdateTest() {
+        ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
+        LocalDateTime newDate = LocalDateTime.now().plusDays(2);
+
+        ReservationDTO updatedReservation = reservationService.updateReservation(createdReservation.getId(), newDate);
+
+        assertEquals(newDate, updatedReservation.getReservationDate());
+    }
+
+    @Test
+        // 존재하지 않는 예약 업데이트 시 예외 발생 테스트
+    void updateNonExistentReservationTest() {
+        LocalDateTime newDate = LocalDateTime.now().plusDays(2);
+        assertThrows(IllegalArgumentException.class, () -> reservationService.updateReservation(9999L, newDate));
+    }
+
+    @Test
+        // 모든 예약 조회 테스트
+    void findAllReservationsTest() {
+        reservationService.reservation(reservationDTO);
+
+        List<ReservationDTO> reservations = reservationService.findReservation();
+
         assertFalse(reservations.isEmpty());
-        assertTrue(reservations.size() >= 2);
     }
 
     @Test
-    void findOne_Exists() {
-        // Given
-        LocalDateTime reservationDate = LocalDateTime.now().plusDays(1);
-        Long reservationId = reservationService.reservation(testUser.getId(), testHospital.getId(), reservationDate);
+        // 특정 예약 조회 테스트
+    void findOneReservationTest() {
+        ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
 
-        // When
-        Reservation foundReservation = reservationService.findOne(reservationId);
+        Optional<ReservationDTO> foundReservation = reservationService.findOne(createdReservation.getId());
 
-        // Then
-        assertNotNull(foundReservation);
-        assertEquals(reservationId, foundReservation.getId());
-    }
-
-    @Test
-    void findOne_NotExists() {
-        // Given
-        Long nonExistentId = 9999L;
-
-        // When
-        Reservation foundReservation = reservationService.findOne(nonExistentId);
-
-        // Then
-        assertNull(foundReservation);
+        assertTrue(foundReservation.isPresent());
+        assertEquals(createdReservation.getId(), foundReservation.get().getId());
     }
 }
