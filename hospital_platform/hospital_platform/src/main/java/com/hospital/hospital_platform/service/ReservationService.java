@@ -29,7 +29,7 @@ public class ReservationService {
      * 예약
      */
     @Transactional
-    public ReservationDTO  reservation(ReservationDTO reservationDTO) {
+    public ReservationDTO reservation(ReservationDTO reservationDTO) {
 
         // 엔티티 조회
         User user = userRepository.findById(reservationDTO.getUserId())
