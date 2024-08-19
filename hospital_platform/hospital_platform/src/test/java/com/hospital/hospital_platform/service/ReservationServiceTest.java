@@ -35,7 +35,6 @@ class ReservationServiceTest {
 
     @Autowired
     private HospitalRepository hospitalRepository;
-
     private User user;
     private Hospital hospital;
     private ReservationForm reservationForm;
