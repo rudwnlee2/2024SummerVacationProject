@@ -28,8 +28,8 @@ public class ReviewBoard {
     private User user;
 
     private String title;
-    private Long like;
-    private Long view;
+    private Long likes;
+    private Long views;
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;

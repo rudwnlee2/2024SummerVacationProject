@@ -1,0 +1,131 @@
+.community-ex {
+    padding: 20px;
+    background-color: #f8f8f8;
+}
+
+.community-ex h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.icons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.icon-item {
+    text-align: center;
+    width: 22%;
+}
+
+.icon-item span {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.icon-item p {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.icon-item small {
+    font-size: 12px;
+    color: #666;
+}
+
+
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    justify-content: center;
+    margin: 20px;
+}
+.card {
+    width: 45%;
+    margin: 0 auto 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    background-color: #fff;
+}
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.card-header img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    background-color: #ccc;
+}
+.card-header .name {
+    font-weight: bold;
+}
+.card-header .time-location {
+    font-size: 0.9em;
+    color: gray;
+}
+.card-header .rating {
+    margin-left: auto;
+    color: #f4c542;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+}
+.card-content {
+    margin-bottom: 16px;
+    white-space: pre-line;
+}
+.title p {
+    font-weight: bold;
+    font-size: 22px;
+}
+.content-p p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+.card-content .read-more {
+    color: lightgray;
+}
+.card-images {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.card-images div {
+    width: 32%;
+    height: 100px;
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 0.9em;
+}
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.card-tags span {
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+.card-footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+.card-footer .like-icon {
+    font-size: 24px;
+    cursor: pointer;
+}

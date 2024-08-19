@@ -16,4 +16,7 @@
       <module name="hospital_platform.hospital_platform.test" target="17" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
+  </component>
 </project>
