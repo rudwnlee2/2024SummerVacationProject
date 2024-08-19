@@ -7,6 +7,8 @@ import CommunityPostCreate from './components/CommunityPostCreate';
 import FreeBoardDetails from './components/FreeBoardDetails';
 import TestFile from './components/TestFile';
 import './App.css';
+import Login from "./components/Login";
+import Signup from "./components/Signup";
 
 function App() {
     return (
@@ -19,6 +21,8 @@ function App() {
                 <Route path="/CommunityPostCreate" element={<CommunityPostCreate />} />
                 <Route path="/FreeBoardDetails" element={<FreeBoardDetails />} />
                 <Route path="/TestFile" element={<TestFile />} />
+                <Route path="/Login" element={<Login />} />
+                <Route path="/Signup" element={<Signup />} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </div>
