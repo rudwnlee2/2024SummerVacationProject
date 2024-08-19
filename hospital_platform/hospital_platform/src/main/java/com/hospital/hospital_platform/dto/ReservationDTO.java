@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 //Entity와 DTO 분리 이유 : 관심사를 분류하기 위해서 Entity는 db와 비즈니스 개체 DTO는 클라이언트와 데이터 교환
 // 이외에도 정보은닉 등등이 있음 좀 더 공부 필요
-@Getter @Setter
+@Getter //@Setter
 public class ReservationDTO {
 
     private final Long id;
