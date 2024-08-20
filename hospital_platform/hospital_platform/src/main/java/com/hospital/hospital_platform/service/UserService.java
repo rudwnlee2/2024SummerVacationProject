@@ -1,7 +1,7 @@
 package com.hospital.hospital_platform.service;
 
 import com.hospital.hospital_platform.domain.Address;
-import com.hospital.hospital_platform.domain.user.User;
+import com.hospital.hospital_platform.domain.User;
 import com.hospital.hospital_platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

@@ -19,7 +19,7 @@ public class Hospital {
 
     @Id //pk
     @Column(name = "hospital_id") //컬럼이름
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //기본키 자동생성
+//    @GeneratedValue(strategy = GenerationType.IDENTITY) //기본키 자동생성 이거는 카카오맵에서 가지고온 아이디로 사용해야하므로 자동생성 X
     private Long id;
     private String name;
 

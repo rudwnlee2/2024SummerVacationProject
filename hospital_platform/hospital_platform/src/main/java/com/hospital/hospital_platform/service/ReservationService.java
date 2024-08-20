@@ -30,22 +30,22 @@ public class ReservationService {
      * 예약
      */
     @Transactional
-    public ReservationDTO reservation(ReservationForm reservationForm) {
+    public ReservationDTO reservation(ReservationDTO reservationDTO) {
 
         // 엔티티 조회
-        User user = userRepository.findById(reservationForm.getUserId())
+        User user = userRepository.findById(reservationDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Hospital hospital = hospitalRepository.findById(reservationForm.getHospitalId())
+        Hospital hospital = hospitalRepository.findById(reservationDTO.getHospitalId())
                 .orElseThrow(() -> new IllegalArgumentException("Hospital not found"));
 
         // 예약 시간 중복 체크 //동시성 문제가 생길 수 있음(나중에 시간되면 고쳐보도록(중복 체크와 예약 생성 논리를 데이터베이스 레벨에서 처리하는 것이 안전) 예) 낙관적 락
-        checkHospitalReservationConflict(hospital.getId(), reservationForm.getReservationDate());
+        checkHospitalReservationConflict(hospital.getId(), reservationDTO.getReservationDate());
 
         // 예약생성
         Reservation reservation = Reservation.builder()
                 .hospital(hospital)
                 .user(user)
-                .reservationDate(reservationForm.getReservationDate())
+                .reservationDate(reservationDTO.getReservationDate())
                 .build();
 
         //예약 저장
@@ -67,12 +67,17 @@ public class ReservationService {
      * 예약변경
      */
     @Transactional
-    public ReservationDTO  updateReservation(Long reservationId, LocalDateTime updateDate) {
+    public ReservationDTO updateReservation(ReservationDTO reservationDTO) {
 
-        Reservation reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findById(reservationDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        Hospital hospital = hospitalRepository.findById(reservationDTO.getHospitalId())
+                .orElseThrow(() -> new IllegalArgumentException("Hospital not found"));
 
-        reservation.updateReservation(updateDate);
+        // 예약 시간 중복 체크 //동시성 문제가 생길 수 있음(나중에 시간되면 고쳐보도록(중복 체크와 예약 생성 논리를 데이터베이스 레벨에서 처리하는 것이 안전) 예) 낙관적 락
+        checkHospitalReservationConflict(hospital.getId(), reservationDTO.getReservationDate());
+
+        reservation.updateReservation(reservationDTO.getReservationDate());
         return ReservationDTO.fromEntity(reservation);
     }
 

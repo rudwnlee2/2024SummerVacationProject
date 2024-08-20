@@ -1,6 +1,6 @@
 package com.hospital.hospital_platform.repository;
 
-import com.hospital.hospital_platform.domain.user.User;
+import com.hospital.hospital_platform.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

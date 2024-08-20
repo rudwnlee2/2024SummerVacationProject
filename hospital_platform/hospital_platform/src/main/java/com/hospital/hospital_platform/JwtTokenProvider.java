@@ -1,5 +1,6 @@
 package com.hospital.hospital_platform;
 
+import com.hospital.hospital_platform.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -70,5 +71,19 @@ public class JwtTokenProvider {
         String email = getEmail(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    // JWT에서 사용자 ID 추출
+    public Long getUserIdFromToken(String token) {
+        String email = getEmail(token); // 토큰에서 이메일 추출
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email); // 이메일로 사용자 정보 조회
+
+        // 사용자 정보에서 ID를 추출합니다. 여기서는 UserDetails의 구현체가 User 클래스로 가정합니다.
+        // UserDetails 구현체에 사용자 ID가 포함된 경우를 가정한 예제입니다.
+        if (userDetails instanceof User) {
+            return ((User) userDetails).getId(); // User 클래스에 getId() 메서드가 있다고 가정합니다.
+        } else {
+            throw new IllegalArgumentException("User details do not contain user ID");
+        }
     }
 }

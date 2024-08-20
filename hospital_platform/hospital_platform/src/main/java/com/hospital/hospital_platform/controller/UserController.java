@@ -1,7 +1,7 @@
 package com.hospital.hospital_platform.controller;
 
 import com.hospital.hospital_platform.JwtTokenProvider;
-import com.hospital.hospital_platform.domain.user.User;
+import com.hospital.hospital_platform.domain.User;
 import com.hospital.hospital_platform.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
