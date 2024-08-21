@@ -38,7 +38,6 @@ public class UserService {
             user.setName(name);
             user.setNickname(nickname);
             user.setPhoneNum(phoneNum);
-
             user.setAddress(new Address(city, street, zipcode));
             user.setCreateDate(LocalDateTime.now());
             user.setUpdateDate(LocalDateTime.now());
@@ -49,7 +48,6 @@ public class UserService {
             throw new RuntimeException(e.getMessage());
         }
     }
-
 
     // 사용자 인증
     public User authenticateUser(String email, String password) {
@@ -66,14 +64,12 @@ public class UserService {
             throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
         }
     }
+
     // 사용자 정보 가져오기
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Optional<User> user = userRepository.findByEmail(email);
+        Long userId = Long.parseLong(authentication.getName()); // ID를 Long으로 변환
+        Optional<User> user = userRepository.findById(userId);
         return user.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     }
-    //사용자 삭제처리
-
-
 }

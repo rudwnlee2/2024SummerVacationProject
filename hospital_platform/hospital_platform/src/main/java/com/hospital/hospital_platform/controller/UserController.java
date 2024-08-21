@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor // 생성자 주입
-@RestController // json 반환
+@RestController // JSON 반환
 @RequestMapping("/api")
 public class UserController {
 
@@ -38,6 +38,7 @@ public class UserController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
+
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> user) {
@@ -46,11 +47,11 @@ public class UserController {
 
             // 사용자 인증
             User authenticatedUser = userService.authenticateUser(user.get("email"), user.get("password"));
-            System.out.println("Debug Log: 인증에 성공한 이메일 - " + authenticatedUser.getEmail());
+            System.out.println("Debug Log: 인증에 성공한 사용자 ID - " + authenticatedUser.getId());
 
             // JWT 토큰 생성
-            String token = jwtTokenProvider.createToken(authenticatedUser.getEmail());
-            System.out.println("Debug Log: JWT 토큰이 생성된 사용자 - " + authenticatedUser.getEmail());
+            String token = jwtTokenProvider.createToken(authenticatedUser.getId());
+            System.out.println("Debug Log: JWT 토큰이 생성된 사용자 ID - " + authenticatedUser.getId());
 
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
@@ -69,11 +70,11 @@ public class UserController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
     // 사용자 정보 가져오기
     @GetMapping("/user")
     public ResponseEntity<User> getCurrentUser(Authentication authentication) {
         User user = userService.getAuthenticatedUser();
         return ResponseEntity.ok(user);
     }
-
 }

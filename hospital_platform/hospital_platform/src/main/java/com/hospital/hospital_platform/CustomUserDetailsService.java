@@ -19,11 +19,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Long id = Long.parseLong(userId); // 전달받은 userId를 Long 타입으로 변환
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
-        return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+        return org.springframework.security.core.userdetails.User.withUsername(user.getId().toString())
                 .password(user.getPassword())
                 .authorities("USER")  // 필요한 경우 권한을 설정
                 .accountExpired(false)
@@ -33,3 +34,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build();
     }
 }
+
