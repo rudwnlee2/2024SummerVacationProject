@@ -33,4 +33,9 @@ public class FreeBoardCommentController {
     public void deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
     }
+
+    @GetMapping("/post/{postId}")
+    public List<FreeBoardComment> getCommentsByPostId(@PathVariable Long postId) {
+        return commentService.findCommentsByPostId(postId);
+    }
 }

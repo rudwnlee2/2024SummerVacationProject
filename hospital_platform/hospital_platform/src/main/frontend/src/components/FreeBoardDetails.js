@@ -1,34 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 function FreeBoardDetails() {
+    const { postId } = useParams();
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
 
+    const fetchComments = useCallback(async () => {
+        const response = await axios.get(`/api/comments/post/${postId}`);
+        setComments(response.data);
+    }, [postId]);
+
     useEffect(() => {
         fetchComments();
-    }, []);
-
-    const fetchComments = async () => {
-        const response = await axios.get('/api/comments');
-        setComments(response.data);
-    };
+    }, [fetchComments]);
 
     const handleAddComment = async () => {
         if (!content) return;
-        await axios.post('/api/comments', { content });
-        fetchComments();  // 댓글 목록 갱신
-        setContent('');  // 입력 필드 초기화
+        await axios.post('/api/comments', { content, postId });
+        fetchComments();
+        setContent('');
     };
 
     const handleDeleteComment = async (id) => {
         await axios.delete(`/api/comments/${id}`);
-        fetchComments();  // 댓글 목록 갱신
+        fetchComments();
     };
 
     return (
         <div>
-            <h1>Comments</h1>
+            <h1>Comments for Post {postId}</h1>
             <input
                 type="text"
                 value={content}

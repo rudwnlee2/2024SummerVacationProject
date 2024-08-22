@@ -3,6 +3,7 @@ package com.hospital.hospital_platform.controller;
 import com.hospital.hospital_platform.domain.board.FreeBoard;
 import com.hospital.hospital_platform.service.FreeBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,5 +34,12 @@ public class FreeBoardController {
     @DeleteMapping("/{id}")
     public void deleteFreeBoard(@PathVariable Long id) {
         freeBoardService.deleteFreeBoard(id);
+    }
+
+    // 게시글 업데이트 API 추가
+    @PutMapping("/{id}")
+    public ResponseEntity<FreeBoard> updateFreeBoard(@PathVariable Long id, @RequestBody FreeBoard freeBoard) {
+        FreeBoard updated = freeBoardService.updateFreeBoard(id, freeBoard);
+        return ResponseEntity.ok(updated);
     }
 }

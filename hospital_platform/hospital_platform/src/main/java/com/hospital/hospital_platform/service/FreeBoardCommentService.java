@@ -31,4 +31,8 @@ public class FreeBoardCommentService {
     public void deleteComment(Long id) {
         commentRepository.deleteById(id);
     }
+
+    public List<FreeBoardComment> findCommentsByPostId(Long freeBoardId) {
+        return commentRepository.findByFreeBoard_Id(freeBoardId);
+    }
 }

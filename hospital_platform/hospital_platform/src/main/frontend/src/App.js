@@ -22,7 +22,7 @@ function App() {
                 <Route path="/Community" element={<CommunityPage />} />
                 <Route path="/Dentistlist" element={<DentistList />} />
                 <Route path="/CommunityPostCreate" element={<CommunityPostCreate />} />
-                <Route path="/FreeBoardDetails" element={<FreeBoardDetails />} />
+                <Route path="/FreeBoardDetails/:postId" element={<FreeBoardDetails />} />
                 <Route path="/TestFile" element={<TestFile />} />
                 <Route path="/Login" element={<Login />} />
                 <Route path="/Signup" element={<Signup />} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import './CommunityPostCreate.css';
 
 function CommunityPostCreate() {
@@ -8,10 +8,32 @@ function CommunityPostCreate() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
 
+    const { id } = useParams();
+
     // 게시글 로드
     useEffect(() => {
-        fetchPosts();
-    }, []);
+        if (id) {
+            // 기존 게시물을 로딩하여 편집
+            const loadPost = async () => {
+                const response = await axios.get(`http://localhost:8080/api/freeboards/${id}`);
+                const { title, content } = response.data;
+                setTitle(title);
+                setContent(content);
+            };
+            loadPost();
+        }
+    }, [id]);
+
+    // 게시글 제출을 생성 또는 업데이트로 분기 처리
+    const handleSubmitPost = async () => {
+        const post = { title, content };
+        if (id) {
+            await axios.put(`http://localhost:8080/api/freeboards/${id}`, post);
+        } else {
+            await axios.post('http://localhost:8080/api/freeboards', post);
+        }
+        // 리다이렉트 또는 게시글 목록 새로고침
+    };
 
     const fetchPosts = async () => {
         const response = await axios.get('http://localhost:8080/api/freeboards');
@@ -45,11 +67,14 @@ function CommunityPostCreate() {
             </div>
             <div className="button-area">
                 <button className="submit-button" onClick={handleAddPost}>게시글 등록</button>
+                <button className="submit-button" onClick={handleSubmitPost}>
+                    {id ? '게시글 업데이트' : '게시글 등록'}
+                </button>
             </div>
             <ul>
                 {posts.map(post => (
                     <li key={post.id}>
-                        {post.title} - {post.content}
+                    {post.title} - {post.content}
                         <button onClick={() => handleDeletePost(post.id)}>Delete</button>
                     </li>
                 ))}

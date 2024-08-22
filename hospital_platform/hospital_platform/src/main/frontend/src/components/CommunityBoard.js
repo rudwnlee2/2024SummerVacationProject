@@ -6,6 +6,29 @@ import {Link} from "react-router-dom";
 const CommunityBoard = () => {
     const [posts, setPosts] = useState([]); // 게시물 상태 관리
 
+    // 모달 상태 추가
+    const [isEditing, setIsEditing] = useState(false);
+    const [editPostId, setEditPostId] = useState(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editContent, setEditContent] = useState('');
+
+// 수정 모달 열기 핸들러
+    const handleEditClick = (post) => {
+        setEditPostId(post.id);
+        setEditTitle(post.title);
+        setEditContent(post.content);
+        setIsEditing(true);
+    };
+
+// 게시글 업데이트 핸들러
+    const handleUpdatePost = async () => {
+        await axios.put(`http://localhost:8080/api/freeboards/${editPostId}`, {
+            title: editTitle,
+            content: editContent
+        });
+        fetchPosts();  // 게시글 목록 새로고침
+    };
+
     /*
     // 게시물 로드
     useEffect(() => {
@@ -16,18 +39,21 @@ const CommunityBoard = () => {
         fetchPosts();
     }, []);
     */
+    // 게시물을 로드하는 함수 정의
+    const fetchPosts = async () => {
+        const response = await axios.get('http://localhost:8080/api/freeboards');
+        const cleanedPosts = response.data.map(post => ({
+            ...post,
+            title: post.title.trim(),   // 제목의 불필요한 공백 제거
+            content: post.content.trim()  // 내용의 불필요한 공백 제거
+        }));
+        setPosts(cleanedPosts);
+    };
+
+    // 컴포넌트가 마운트될 때 게시물 로드
     useEffect(() => {
-        const fetchPosts = async () => {
-            const response = await axios.get('http://localhost:8080/api/freeboards');
-            const cleanedPosts = response.data.map(post => ({
-                ...post,
-                title: post.title.trim(),   // 제목의 불필요한 공백 제거
-                content: post.content.trim()  // 내용의 불필요한 공백 제거
-            }));
-            setPosts(cleanedPosts);
-        };
         fetchPosts();
-    }, []);
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시에만 실
 
     return (
         <>
@@ -71,7 +97,8 @@ const CommunityBoard = () => {
                             </div>
                         </div>
                         <div className="card-content">
-                            <Link to={`/FreeBoardDetails/${post.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                            <Link to={`/FreeBoardDetails/${post.id}`}
+                                  style={{textDecoration: 'none', color: 'inherit'}}>
                                 <div className="title">
                                     <p>{post.title.trim()}</p> {/* post.title 사용 */}
                                 </div>
@@ -80,9 +107,19 @@ const CommunityBoard = () => {
                                 </div>
                             </Link>
                             <span className="read-more">더보기</span>
+                            <button onClick={() => handleEditClick(post)}>수정</button>
+                            {isEditing && (
+                                <div className="modal">
+                                    <input type="text" value={editTitle}
+                                           onChange={(e) => setEditTitle(e.target.value)}/>
+                                    <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)}/>
+                                    <button onClick={handleUpdatePost}>게시글 업데이트</button>
+                                    <button onClick={() => setIsEditing(false)}>취소</button>
+                                </div>
+                            )}
                         </div>
                         <div className="card-images">
-                            <div>사진1</div>
+                        <div>사진1</div>
                             <div>사진2</div>
                             <div>사진3</div>
                         </div>
@@ -94,7 +131,9 @@ const CommunityBoard = () => {
                             <span>태그5...</span>
                         </div>
                         <div className="card-footer">
-                            <span className="like-icon">♡</span>
+                            <img className="post-icon" src="image/heart.png" alt="like-icon"/>
+                            <img className="post-icon-comment" src="image/comment.png" alt="comment-icon"/>
+                            <p className="comment-count">(0)</p>
                         </div>
                     </div>
                 ))}

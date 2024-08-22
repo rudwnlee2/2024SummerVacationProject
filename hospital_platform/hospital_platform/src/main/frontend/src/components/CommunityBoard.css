@@ -122,10 +122,24 @@ body {
 }
 .card-footer {
     display: flex;
-    justify-content: flex-start;
+    flex-direction: row;
     margin-top: 10px;
 }
 .card-footer .like-icon {
     font-size: 24px;
     cursor: pointer;
+}
+.post-icon {
+    width: 25px;
+    height: 25px;
+    padding: 5px 10px 5px 0;
+}
+.post-icon-comment {
+    width: 25px;
+    height: 25px;
+    padding: 5px 3px 5px 0;
+}
+.comment-count {
+    margin: 14px 0 0 0;
+    font-size: 14px;
 }
