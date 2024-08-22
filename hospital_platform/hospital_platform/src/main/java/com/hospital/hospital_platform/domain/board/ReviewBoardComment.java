@@ -28,4 +28,7 @@ public class ReviewBoardComment {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
+    public void setReviewBoardId(Long reviewBoardId) {
+
+    }
 }

@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/hospital_platform?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
     username: root
-    password: Riderback07!@
+    password: shark0128
   #이거는 공부를 많이 못함 일단 동작되는거 확인하고 멈춰서 엄..음...나중에 문제생길지도,,? 푸하하핫
   jpa:
     database: mysql

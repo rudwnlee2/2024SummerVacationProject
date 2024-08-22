@@ -1,0 +1,90 @@
+.review-board {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.review-board h1, .review-board h2 {
+    color: #333;
+    text-align: center;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.card-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.name {
+    font-weight: bold;
+}
+
+.time-location {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.rating {
+    margin-left: auto;
+    color: #f8ce0b;
+}
+
+.card-content {
+    margin-bottom: 10px;
+}
+
+.title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.content-p {
+    color: #333;
+}
+
+.read-more {
+    color: #0066cc;
+    cursor: pointer;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.card-tags span {
+    background-color: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.8em;
+}
+
+button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

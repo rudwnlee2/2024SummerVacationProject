@@ -1,10 +1,11 @@
 // src/components/CommunityPage.js
 import React, { useEffect, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import BlueCircle from '../images/bluecircle.png';
 import MyLocation from '../images/mylocation.png';
+import axios from "axios";
 
-const CommunityPage = () => {
+const Map = () => {
 
     // 상태 관리
     const [searchKeyword, setSearchKeyword] = useState('');
@@ -18,6 +19,32 @@ const CommunityPage = () => {
     const mapInstanceRef = useRef(null);
     const currentLocationMarkerRef = useRef(null);
     const markersAndInfowindowsRef = useRef([]);
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const navigate = useNavigate();
+    
+
+    useEffect(() => {
+        const saveHospitalAndNavigate = async (hospitalId) => {
+            try {
+                // 백엔드 API를 호출하여 Hospital ID를 저장합니다.
+                await axios.post('/api/hospitals', { id: hospitalId });
+
+                // 저장이 성공하면 예약 페이지로 이동합니다.
+                navigate(`/reservation/${hospitalId}`);
+            } catch (error) {
+                console.error('Failed to save hospital:', error);
+                // 에러 처리 (예: 사용자에게 알림)
+            }
+        };
+
+        window.openReservationPage = (placeId) => {
+            saveHospitalAndNavigate(placeId);
+        };
+
+        return () => {
+            delete window.openReservationPage;
+        };
+    }, [navigate]);
 
     useEffect(() => {
         // 지도 초기화 및 현재 위치 설정
@@ -122,8 +149,16 @@ const CommunityPage = () => {
                 position: coords,
             });
 
+            const content = `
+                <div style="padding:5px;font-size:12px;">
+                    <strong>${place.place_name}</strong><br/>
+                    <button onclick="window.openReviewPostCreate('${place.id}', '${place.place_name}')">후기 페이지로 이동하기</button>
+                    <button onclick="window.openReservationSystem('${place.id}')">예약 페이지로 이동하기</button>
+                </div>
+            `;
+
             const infowindow = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;font-size:12px;">${place.place_name}</div>`,
+                content: content,
             });
 
             kakao.maps.event.addListener(marker, 'click', () => {
@@ -136,6 +171,32 @@ const CommunityPage = () => {
 
         markersAndInfowindowsRef.current = newMarkersAndInfowindows;
         mapInstanceRef.current.setBounds(bounds);
+    };
+
+    useEffect(() => {
+        window.openReviewPostCreate = (placeId, placeName) => {
+            console.log("openReviewPage called", placeId, placeName);
+            navigate('/ReviewPostCreate', { state: { hospitalId: placeId, hospitalName: placeName } });
+        };
+        window.openReviewPostCreate = (placeId, placeName) => {
+            navigate('/ReviewPostCreate', { state: { hospitalId: placeId, hospitalName: placeName } });
+        };
+        window.openReservationSystem = (placeId) => {
+            // 예약 페이지로 이동하는 로직
+        };
+
+        return () => {
+            delete window.openReviewPostCreate();
+            delete window.openReservationSystem();
+        };
+    }, [navigate]);
+
+    const handlePlaceClick = (place) => {
+        setSelectedPlace(place);
+        // 해당 마커의 위치로 지도 중심 이동
+        const { kakao } = window;
+        const moveLatLon = new kakao.maps.LatLng(place.y, place.x);
+        mapInstanceRef.current.panTo(moveLatLon);
     };
 
     const handlePageChange = (newPage) => {
@@ -226,9 +287,17 @@ const CommunityPage = () => {
                 </div>
                 <div style={{flex: 1, marginLeft: '20px'}}>
                     <h2>검색된 치과 목록</h2>
-                    <ul>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
                         {places.map((place, index) => (
-                            <li key={index} style={{marginBottom: '10px'}}>
+                            <li key={index} style={{
+                                marginBottom: '10px',
+                                padding: '10px',
+                                border: '1px solid #ddd',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                backgroundColor: selectedPlace && selectedPlace.id === place.id ? '#f0f0f0' : 'white'
+                            }}
+                                onClick={() => handlePlaceClick(place)}>
                                 <strong>{place.place_name}</strong>
                                 <br/>
                                 {place.road_address_name || place.address_name}
@@ -236,9 +305,22 @@ const CommunityPage = () => {
                                 {place.phone}
                                 <br/>
                                 좌표: ({place.x}, {place.y})
+                                <br/>
+                                ID: {place.id}
                             </li>
                         ))}
                     </ul>
+                    {selectedPlace && (
+                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                            <h3>{selectedPlace.place_name}</h3>
+                            <button onClick={() => navigate(`/review/${selectedPlace.id}`)} style={{ margin: '5px' }}>
+                                후기페이지 작성
+                            </button>
+                            <button onClick={() => window.openReservationSystem(selectedPlace.id)} style={{ margin: '5px' }}>
+                                예약 페이지로 이동
+                            </button>
+                        </div>
+                    )}
                     {totalPages > 1 && (
                         <div style={{textAlign: "center", marginTop: '20px' }}>
                             <button
@@ -264,4 +346,4 @@ const CommunityPage = () => {
     );
 };
 
-export default CommunityPage;
+export default Map;

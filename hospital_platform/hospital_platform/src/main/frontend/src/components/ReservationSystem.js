@@ -25,7 +25,7 @@ function ReservationSystem() {
     const fetchMyReservations = async () => {
         try {
             const data = await getMyReservations();
-            setMyReservations(data);
+            //setMyReservations(data);
         } catch (error) {
             console.error('내 예약 목록을 가져오는데 실패했습니다:', error);
         }
