@@ -18,15 +18,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    // 주어진 사용자 ID를 기반으로 사용자 정보를 로드하는 메서드입니다.
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Long id = Long.parseLong(userId); // 전달받은 userId를 Long 타입으로 변환
-        User user = userRepository.findById(id)
+        // 주어진 ID로 사용자를 조회합니다. 사용자 ID는 문자열로 전달됩니다.
+        User user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
-        return org.springframework.security.core.userdetails.User.withUsername(user.getId().toString())
+        // UserDetails 객체를 생성하여 반환합니다.
+        return org.springframework.security.core.userdetails.User.withUsername(String.valueOf(user.getId()))
                 .password(user.getPassword())
-                .authorities("USER")  // 필요한 경우 권한을 설정
+                .authorities("USER")  // 권한을 설정합니다.
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)
@@ -34,4 +36,3 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build();
     }
 }
-

@@ -21,12 +21,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    // HTTP 요청마다 실행되는 필터입니다. 토큰을 검증하고 인증 정보를 설정합니다.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String token = jwtTokenProvider.resolveToken(request);
+        String token = jwtTokenProvider.resolveToken(request); // 요청에서 토큰을 추출합니다.
 
+        // 토큰이 존재하고 유효한 경우 인증 정보를 설정합니다.
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             if (authentication != null) {
@@ -34,6 +36,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
         }
 
+        // 다음 필터를 호출합니다.
         chain.doFilter(request, response);
     }
 }

@@ -16,4 +16,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE r.hospital.id = :hospitalId AND r.reservationDate = :reservationDate")
     List<Reservation> findByHospitalIdAndReservationDate(@Param("hospitalId") Long hospitalId, @Param("reservationDate") LocalDateTime reservationDate);
 
+    /**
+     * userId로 예약한 정보를 모두 가지고 올때 사용 List로 받아와야되서 이렇게 정의후 서비스계층에서 사용 
+     */
+    List<Reservation> findAllByUserId(Long userId);
 }

@@ -3,6 +3,7 @@ package com.hospital.hospital_platform.domain.hospital;
 import com.hospital.hospital_platform.domain.Address;
 import com.hospital.hospital_platform.domain.Reservation;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +30,15 @@ public class Hospital {
     private String hospitalPhoneNum;
     private LocalDateTime openTime;
     private LocalDateTime closeTime;
+
+    @Builder
+    public Hospital(Long id, String name, Address address, String hospitalPhoneNum) {
+
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.hospitalPhoneNum = hospitalPhoneNum;
+    }
 
     @OneToMany(mappedBy = "hospital") //mappedBy를 안쓰면 단방향이 되버림
     private List<Reservation> reservations = new ArrayList<>();

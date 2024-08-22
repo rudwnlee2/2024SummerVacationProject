@@ -1,6 +1,7 @@
 package com.hospital.hospital_platform.service;
 
 import com.hospital.hospital_platform.controller.HospitalForm;
+import com.hospital.hospital_platform.domain.Address;
 import com.hospital.hospital_platform.domain.hospital.Hospital;
 import com.hospital.hospital_platform.repository.HospitalRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,28 @@ public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
 
-//    @Transactional
-//    public Long saveHospital()
+    /**
+     * 병원 정보저장
+     */
+    @Transactional
+    public Long saveHospital(Long id, String name, Address address, String hospitalPhoneNum) {
+        Hospital hospital = Hospital.builder()
+                .id(id)
+                .name(name)
+                .address(address)
+                .hospitalPhoneNum(hospitalPhoneNum)
+                .build();
+        hospitalRepository.save(hospital);
+        return hospital.getId();
+    }
 
     /**
      * 병원ID 체크 메서드
      */
-    public void checkHospitalID(Long hospitalId){
+    public boolean checkHospitalID(Long hospitalId){
         Optional<Hospital> hospital = hospitalRepository.findById(hospitalId);
-        if (hospital.isPresent()) {
 
-        }
+        return hospital.isPresent(); // 값을 가지고 있으면 true 없으면 false
     }
 
 }

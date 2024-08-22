@@ -88,10 +88,22 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 유저가 예약한 정보들
+     */
+    public List<ReservationDTO> findReservationsByUserId(Long userId) {
+        List<Reservation> reservations = reservationRepository.findAllByUserId(userId);
+        return reservations.stream()
+                .map(ReservationDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     public Optional<ReservationDTO> findOne(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .map(ReservationDTO::fromEntity);  // 엔티티를 DTO로 변환
     }
+
+
 
 
     /**

@@ -2,6 +2,7 @@ package com.hospital.hospital_platform.controller;
 
 import com.hospital.hospital_platform.JwtTokenProvider;
 import com.hospital.hospital_platform.dto.ReservationDTO;
+import com.hospital.hospital_platform.service.HospitalService;
 import com.hospital.hospital_platform.service.ReservationService;
 import jakarta.persistence.Id;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 //form과 dto의 차이 form은 사용자로부터 데이터 수집 후 서비스 계층에 전달할때 사용
@@ -25,12 +27,18 @@ import java.util.Optional;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final HospitalService hospitalService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
     public ResponseEntity<ReservationDTO> createReservation(
             @Valid @RequestBody ReservationDTO reservationDTO,
             @RequestHeader("Authorization") String token) {
+
+        if (!hospitalService.checkHospitalID(reservationDTO.getHospitalId())) {
+//            hospitalService.saveHospital(); //엄엄
+        }
+
         Long userId = getUserIdFromToken(token);
         reservationDTO.setUserId(userId);
         ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
@@ -78,6 +86,15 @@ public class ReservationController {
         if (!jwtTokenProvider.validateToken(token)) {
             throw new IllegalArgumentException("Invalid or expired JWT token");
         }
-        return jwtTokenProvider.getUserIdFromToken(token);
+        return jwtTokenProvider.getUserId(token);
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<ReservationDTO>> getMyReservations(@RequestHeader("Authorization") String token) {
+        Long userId = getUserIdFromToken(token);
+        List<ReservationDTO> reservations = reservationService.findReservationsByUserId(userId);
+        return ResponseEntity.ok(reservations);
+    }
+
+
 }

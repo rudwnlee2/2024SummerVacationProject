@@ -37,3 +37,27 @@ export const updateReservation = async (id, reservationData) => {
 export const cancelReservation = async (id) => {
     await api.delete(`/reservations/${id}`);
 };
+
+// api.js 파일에 추가
+
+export const getMyReservations = async () => {
+    try {
+        const response = await fetch('/api/reservations/my', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('내 예약 목록을 가져오는데 실패했습니다');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('API 호출 중 오류 발생:', error);
+        throw error;
+    }
+};

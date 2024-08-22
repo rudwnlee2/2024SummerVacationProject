@@ -9,7 +9,9 @@ import TestFile from './components/TestFile';
 import './App.css';
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import ReservationSystem from './components/ReservationSystem';  // 새로 추가
+import ReservationSystem from './components/ReservationSystem';
+import ReservationList from "./components/ReservationList";
+import ReservationForm from "./components/ReservationForm";  // 새로 추가
 
 function App() {
     return (
@@ -24,7 +26,9 @@ function App() {
                 <Route path="/TestFile" element={<TestFile />} />
                 <Route path="/Login" element={<Login />} />
                 <Route path="/Signup" element={<Signup />} />
-                <Route path="/Reservation" element={<ReservationSystem />} />  {/* 새로 추가 */}
+                <Route path="/ReservationSystem" element={<ReservationSystem />} />  {/* 새로 추가 */}
+                <Route path="/ReservationList" element={<ReservationList />} />  {/* 새로 추가 */}
+                <Route path="/ReservationForm" element={<ReservationForm />} />  {/* 새로 추가 */}
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </div>
