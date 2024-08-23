@@ -1,65 +1,57 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function ReviewBoardDetails() {
     const [review, setReview] = useState(null);
-    const [comments, setComments] = useState([]);
-    const [content, setContent] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const { id } = useParams();
-
-    const fetchReview = useCallback(async () => {
-        const response = await axios.get(`/api/reviewboards/${id}`);
-        setReview(response.data);
-    }, [id]);
-
-    const fetchComments = useCallback(async () => {
-        const response = await axios.get(`/api/reviewboards/${id}/comments`);
-        setComments(response.data);
-    }, [id]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetchReview();
-        fetchComments();
-    }, [fetchReview, fetchComments]);
+        const fetchReviewDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/reviewboards/${id}`);
+                setReview(response.data);
+                setLoading(false);
+            } catch (err) {
+                setError('리뷰를 불러오는데 실패했습니다.');
+                setLoading(false);
+                console.error('리뷰 상세 정보 불러오기 오류:', err);
+            }
+        };
 
-    const handleAddComment = async () => {
-        if (!content) return;
-        await axios.post(`/api/reviewboards/${id}/comments`, { content });
-        fetchComments();
-        setContent('');
+        fetchReviewDetails();
+    }, [id]);
+
+    const handleDelete = async () => {
+        if (window.confirm('이 리뷰를 삭제하시겠습니까?')) {
+            try {
+                await axios.delete(`http://localhost:8080/api/reviewboards/${id}`);
+                navigate('/ReviewBoard');
+            } catch (err) {
+                setError('리뷰 삭제에 실패했습니다.');
+                console.error('리뷰 삭제 오류:', err);
+            }
+        }
     };
 
-    const handleDeleteComment = async (commentId) => {
-        await axios.delete(`/api/reviewboards/${id}/comments/${commentId}`);
-        fetchComments();
-    };
-
-    if (!review) return <div>Loading...</div>;
+    if (loading) return <div>로딩 중...</div>;
+    if (error) return <div>{error}</div>;
+    if (!review) return <div>리뷰를 찾을 수 없습니다.</div>;
 
     return (
-        <div>
-            <h1>{review.title}</h1>
-            <p>병원: {review.hospitalName}</p>
-            <p>평점: {review.rating}/5</p>
-            <p>{review.content}</p>
-
-            <h2>댓글</h2>
-            <input
-                type="text"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="댓글을 입력하세요"
-            />
-            <button onClick={handleAddComment}>댓글 작성</button>
-            <ul>
-                {comments.map(comment => (
-                    <li key={comment.id}>
-                        {comment.content}
-                        <button onClick={() => handleDeleteComment(comment.id)}>삭제</button>
-                    </li>
-                ))}
-            </ul>
+        <div className="review-details">
+            <h2>{review.title}</h2>
+            <p><strong>병원 이름:</strong> {review.hospital_name}</p>
+            <p><strong>병원 ID:</strong> {review.hospital_id}</p>
+            <p><strong>내용:</strong> {review.content}</p>
+            <p><strong>작성일:</strong> {new Date(review.createDate).toLocaleString()}</p>
+            <p><strong>수정일:</strong> {new Date(review.updateDate).toLocaleString()}</p>
+            <button onClick={() => navigate(`/ReviewBoard/edit/${id}`)}>수정</button>
+            <button onClick={handleDelete}>삭제</button>
+            <button onClick={() => navigate('/ReviewBoard')}>목록으로 돌아가기</button>
         </div>
     );
 }

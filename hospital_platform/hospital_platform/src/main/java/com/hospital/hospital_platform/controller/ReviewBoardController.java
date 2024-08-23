@@ -20,8 +20,15 @@ public class ReviewBoardController {
     }
 
     @GetMapping
-    public List<ReviewBoard> getAllReviewBoards() {
-        return reviewBoardService.getAllReviewBoards();
+    public ResponseEntity<List<ReviewBoard>> getAllReviewBoards() {
+        List<ReviewBoard> reviews = reviewBoardService.getAllReviewBoards();
+        return ResponseEntity.ok(reviews);
+    }
+
+    @PostMapping
+    public ResponseEntity<ReviewBoard> createReviewBoard(@RequestBody ReviewBoard reviewBoard) {
+        ReviewBoard createdReview = reviewBoardService.createReviewBoard(reviewBoard);
+        return ResponseEntity.ok(createdReview);
     }
 
     @GetMapping("/{id}")
@@ -31,9 +38,11 @@ public class ReviewBoardController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ReviewBoard createReviewBoard(@RequestBody ReviewBoard reviewBoard) {
-        return reviewBoardService.createReviewBoard(reviewBoard);
+    @PutMapping("/{id}")
+    public ResponseEntity<ReviewBoard> updateReviewBoard(@PathVariable Long id, @RequestBody ReviewBoard reviewBoard) {
+        return reviewBoardService.updateReviewBoard(id, reviewBoard)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -41,6 +50,4 @@ public class ReviewBoardController {
         reviewBoardService.deleteReviewBoard(id);
         return ResponseEntity.ok().build();
     }
-
-    // 추가적인 엔드포인트들...
 }

@@ -3,15 +3,11 @@ import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
 import './ReviewPostCreate.css';
 
-console.log("ReviewPostCreate component loaded");
-
-
 function ReviewPostCreate() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [hospitalName, setHospitalName] = useState('');
     const [hospitalId, setHospitalId] = useState('');
-    const [rating, setRating] = useState(5);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -27,13 +23,13 @@ function ReviewPostCreate() {
             await axios.post('http://localhost:8080/api/reviewboards', {
                 title,
                 content,
-                hospitalName,
-                hospitalId,
-                rating
+                hospital_name: hospitalName,
+                hospital_id: parseInt(hospitalId, 10)
             });
             navigate('/ReviewBoard');
         } catch (error) {
-            console.error("Error creating review:", error);
+            console.error("리뷰 생성 중 오류 발생:", error);
+            alert("리뷰 생성에 실패했습니다: " + (error.response?.data || error.message));
         }
     };
 
@@ -45,19 +41,10 @@ function ReviewPostCreate() {
                        placeholder="제목을 입력하세요" />
             </div>
             <div className="message-box">
-                <input type="text" value={hospitalName} onChange={(e) => setHospitalName(e.target.value)}
-                       placeholder="병원 이름" readOnly />
+                <input type="text" value={hospitalName} readOnly placeholder="병원 이름" />
             </div>
             <div className="message-box">
-                <input type="text" value={hospitalId} onChange={(e) => setHospitalId(e.target.value)}
-                       placeholder="병원 ID" readOnly />
-            </div>
-            <div className="message-box">
-                <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                    {[1, 2, 3, 4, 5].map(num => (
-                        <option key={num} value={num}>{num}</option>
-                    ))}
-                </select>
+                <input type="text" value={hospitalId} readOnly placeholder="병원 ID" />
             </div>
             <div className="message-box">
                 <textarea value={content} onChange={(e) => setContent(e.target.value)}

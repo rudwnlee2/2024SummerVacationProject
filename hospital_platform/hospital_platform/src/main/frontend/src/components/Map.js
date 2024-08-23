@@ -1,70 +1,56 @@
 // src/components/CommunityPage.js
-import React, { useEffect, useState, useRef } from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BlueCircle from '../images/bluecircle.png';
 import MyLocation from '../images/mylocation.png';
-import axios from "axios";
 
 const Map = () => {
-
     // 상태 관리
     const [searchKeyword, setSearchKeyword] = useState('');
     const [places, setPlaces] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [currentLocation, setCurrentLocation] = useState(null);
+    const [selectedPlace, setSelectedPlace] = useState(null);
 
     // ref 관리
     const mapRef = useRef(null);
     const mapInstanceRef = useRef(null);
     const currentLocationMarkerRef = useRef(null);
     const markersAndInfowindowsRef = useRef([]);
-    const [selectedPlace, setSelectedPlace] = useState(null);
+
     const navigate = useNavigate();
-    
+    const location = useLocation();
 
-    useEffect(() => {
-        const saveHospitalAndNavigate = async (hospitalId) => {
-            try {
-                // 백엔드 API를 호출하여 Hospital ID를 저장합니다.
-                await axios.post('/api/hospitals', { id: hospitalId });
-
-                // 저장이 성공하면 예약 페이지로 이동합니다.
-                navigate(`/reservation/${hospitalId}`);
-            } catch (error) {
-                console.error('Failed to save hospital:', error);
-                // 에러 처리 (예: 사용자에게 알림)
-            }
-        };
-
-        window.openReservationPage = (placeId) => {
-            saveHospitalAndNavigate(placeId);
-        };
-
-        return () => {
-            delete window.openReservationPage;
-        };
+    // 후기 게시판으로 이동하는 함수
+    const navigateToReview = useCallback((placeId, placeName) => {
+        console.log("Moving to review page for:", placeId, placeName);
+        navigate('/ReviewPostCreate', {
+            state: { hospitalId: placeId, hospitalName: placeName }
+        });
     }, [navigate]);
 
+    // 예약 페이지로 이동하는 함수
+    const navigateToReservation = useCallback((placeId, placeName) => {
+        console.log("Moving to reservation page for:", placeId, placeName);
+        navigate('/reservation', {
+            state: { hospitalId: placeId, hospitalName: placeName }
+        });
+    }, [navigate]);
+
+    // 지도 초기화 및 이벤트 리스너 설정
     useEffect(() => {
-        // 지도 초기화 및 현재 위치 설정
         if (!mapInstanceRef.current) {
             initializeMap();
             getCurrentLocation();
         }
 
-        // 컴포넌트 언마운트 시 정리
-        return () => {
-            markersAndInfowindowsRef.current.forEach(({ marker, infowindow }) => {
-                marker.setMap(null);
-                infowindow.close();
-            });
-            if (currentLocationMarkerRef.current) {
-                currentLocationMarkerRef.current.setMap(null);
-            }
-        };
+        setupGlobalFunctions();
+
+        return cleanupFunction;
     }, []);
 
+    // 지도 초기화
     const initializeMap = () => {
         const { kakao } = window;
         const container = document.getElementById('map');
@@ -80,6 +66,7 @@ const Map = () => {
         mapInstance.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
     };
 
+    // 현재 위치 가져오기
     const getCurrentLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
@@ -106,7 +93,8 @@ const Map = () => {
         }
     };
 
-    const searchPlaces = (page = 1) => {
+    // 장소 검색
+    const searchPlaces = useCallback((page = 1) => {
         if (!mapRef.current || !searchKeyword.trim() || !currentLocation) return;
 
         const { kakao } = window;
@@ -136,8 +124,9 @@ const Map = () => {
                 console.error('Failed to search places:', status);
             }
         }, searchOptions);
-    };
+    }, [searchKeyword, currentLocation]);
 
+    // 검색 결과 마커 표시
     const displayMarkers = (places) => {
         const { kakao } = window;
         const bounds = new kakao.maps.LatLngBounds();
@@ -149,17 +138,7 @@ const Map = () => {
                 position: coords,
             });
 
-            const content = `
-                <div style="padding:5px;font-size:12px;">
-                    <strong>${place.place_name}</strong><br/>
-                    <button onclick="window.openReviewPostCreate('${place.id}', '${place.place_name}')">후기 페이지로 이동하기</button>
-                    <button onclick="window.openReservationSystem('${place.id}')">예약 페이지로 이동하기</button>
-                </div>
-            `;
-
-            const infowindow = new kakao.maps.InfoWindow({
-                content: content,
-            });
+            const infowindow = createInfoWindow(place);
 
             kakao.maps.event.addListener(marker, 'click', () => {
                 infowindow.open(mapInstanceRef.current, marker);
@@ -173,72 +152,72 @@ const Map = () => {
         mapInstanceRef.current.setBounds(bounds);
     };
 
-    useEffect(() => {
-        window.openReviewPostCreate = (placeId, placeName) => {
-            console.log("openReviewPage called", placeId, placeName);
-            navigate('/ReviewPostCreate', { state: { hospitalId: placeId, hospitalName: placeName } });
-        };
-        window.openReviewPostCreate = (placeId, placeName) => {
-            navigate('/ReviewPostCreate', { state: { hospitalId: placeId, hospitalName: placeName } });
-        };
-        window.openReservationSystem = (placeId) => {
-            // 예약 페이지로 이동하는 로직
-        };
+    // 장소에 대한 인포윈도우 생성
+    const createInfoWindow = (place) => {
+        const { kakao } = window;
+        const content = `
+            <div style="padding:5px;font-size:12px;">
+                <strong>${place.place_name}</strong><br/>
+                <button onclick="window.openReviewPostCreate('${place.id}', '${place.place_name}')">후기 페이지로 이동하기</button>
+                <button onclick="window.openReservationSystem('${place.id}', '${place.place_name}')">예약 페이지로 이동하기</button>
+            </div>
+        `;
 
-        return () => {
-            delete window.openReviewPostCreate();
-            delete window.openReservationSystem();
-        };
-    }, [navigate]);
+        return new kakao.maps.InfoWindow({ content });
+    };
 
+    // 전역 함수 설정
+    const setupGlobalFunctions = useCallback(() => {
+        window.openReviewPostCreate = (placeId, placeName) => {
+            navigateToReview(placeId, placeName);
+        };
+        window.openReservationSystem = (placeId, placeName) => {
+            navigateToReservation(placeId, placeName);
+        };
+    }, [navigateToReview, navigateToReservation]);
+
+    // 정리 함수
+    const cleanupFunction = () => {
+        markersAndInfowindowsRef.current.forEach(({ marker, infowindow }) => {
+            marker.setMap(null);
+            infowindow.close();
+        });
+        if (currentLocationMarkerRef.current) {
+            currentLocationMarkerRef.current.setMap(null);
+        }
+        delete window.openReviewPostCreate;
+        delete window.openReservationSystem;
+    };
+
+    // 장소 클릭 핸들러
     const handlePlaceClick = (place) => {
         setSelectedPlace(place);
-        // 해당 마커의 위치로 지도 중심 이동
         const { kakao } = window;
         const moveLatLon = new kakao.maps.LatLng(place.y, place.x);
         mapInstanceRef.current.panTo(moveLatLon);
     };
 
+    // 페이지 변경 핸들러
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             searchPlaces(newPage);
         }
     };
 
+    // 현재 위치로 이동
     const moveToCurrentLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { latitude, longitude } = position.coords;
-                const coords = new window.kakao.maps.LatLng(latitude, longitude);
-                mapInstanceRef.current.setCenter(coords);
-                setCurrentLocation({ lat: latitude, lng: longitude });
-
-                if (currentLocationMarkerRef.current) {
-                    currentLocationMarkerRef.current.setMap(null);
-                }
-
-                currentLocationMarkerRef.current = new window.kakao.maps.Marker({
-                    map: mapInstanceRef.current,
-                    position: coords,
-                    image: new window.kakao.maps.MarkerImage(
-                        BlueCircle,
-                        new window.kakao.maps.Size(15, 15),
-                        { offset: new window.kakao.maps.Point(7.5, 7.5) }
-                    ),
-                });
-            }, (error) => {
-                console.error('Error getting current location:', error);
-            });
+        if (currentLocation) {
+            const { kakao } = window;
+            const coords = new kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+            mapInstanceRef.current.setCenter(coords);
         } else {
-            console.error('Geolocation is not supported by this browser.');
+            getCurrentLocation();
         }
     };
 
-    // URL 잘 받는지 useLocation을 통해 확인
-    const location = useLocation();
+    // URL 파라미터 확인
     const queryParams = new URLSearchParams(location.search);
     const searchQuery = queryParams.get('search');
-
     console.log('Search Query:', searchQuery);
 
     return (
@@ -303,20 +282,16 @@ const Map = () => {
                                 {place.road_address_name || place.address_name}
                                 <br/>
                                 {place.phone}
-                                <br/>
-                                좌표: ({place.x}, {place.y})
-                                <br/>
-                                ID: {place.id}
                             </li>
                         ))}
                     </ul>
                     {selectedPlace && (
                         <div style={{ marginTop: '20px', textAlign: 'center' }}>
                             <h3>{selectedPlace.place_name}</h3>
-                            <button onClick={() => navigate(`/review/${selectedPlace.id}`)} style={{ margin: '5px' }}>
+                            <button onClick={() => navigateToReview(selectedPlace.id, selectedPlace.place_name)} style={{ margin: '5px' }}>
                                 후기페이지 작성
                             </button>
-                            <button onClick={() => window.openReservationSystem(selectedPlace.id)} style={{ margin: '5px' }}>
+                            <button onClick={() => navigateToReservation(selectedPlace.id, selectedPlace.place_name)} style={{ margin: '5px' }}>
                                 예약 페이지로 이동
                             </button>
                         </div>

@@ -28,13 +28,9 @@ public class ReviewBoard {
     private User user;
 
     private String title;
-    private Long likes;
-    private Long views;
+    private Long hospital_id;
+    private String hospital_name;
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-
-    @OneToMany(mappedBy = "reviewBoard") //mappedBy를 안쓰면 단방향이 되버림
-    private List<ReviewBoardComment> reviewBoardComments = new ArrayList<>();
-
 }
