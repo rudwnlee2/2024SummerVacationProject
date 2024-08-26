@@ -15,6 +15,7 @@ import Signup from "./components/Signup";
 import ReservationSystem from './components/ReservationSystem';
 import ReservationList from "./components/ReservationList";
 import ReservationForm from "./components/ReservationForm";  // 새로 추가
+import MyReservations from './components/MyReservations';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                 <h1 className="App-title"></h1>
                 <div className="login-button">
                     <Link to="/Login">Login</Link>
+                    <Link to="/my-reservations">내 예약 목록</Link>
                 </div>
             </header>
 
@@ -54,6 +56,7 @@ function App() {
                 <Route path="/ReservationList" element={<ReservationList />} />
                 <Route path="/ReservationForm" element={<ReservationForm />} />
                 <Route path="*" element={<Navigate to="/" />} />
+                <Route path="/my-reservations" element={<MyReservations />} />
             </Routes>
         </div>
     );

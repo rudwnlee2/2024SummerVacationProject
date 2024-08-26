@@ -37,7 +37,7 @@ public class ReservationController {
         if (token == null || token.isEmpty()) {
             // 토큰이 없거나 비어있는 경우, 로그인 페이지로 리다이렉트
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .header("Location", "/login")
+                    .header("Location", "/Login")
                     .build();
         }
 
