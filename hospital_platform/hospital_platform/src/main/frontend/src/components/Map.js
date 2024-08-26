@@ -33,7 +33,7 @@ const Map = () => {
     // 예약 페이지로 이동하는 함수
     const navigateToReservation = useCallback((placeId, placeName) => {
         console.log("Moving to reservation page for:", placeId, placeName);
-        navigate('/reservation', {
+        navigate('/ReservationSystem', {
             state: { hospitalId: placeId, hospitalName: placeName }
         });
     }, [navigate]);

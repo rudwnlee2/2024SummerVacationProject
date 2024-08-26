@@ -21,12 +21,10 @@ public class HospitalService {
      * 병원 정보저장
      */
     @Transactional
-    public Long saveHospital(Long id, String name, Address address, String hospitalPhoneNum) {
+    public Long saveHospital(Long id, String name) {
         Hospital hospital = Hospital.builder()
                 .id(id)
                 .name(name)
-                .address(address)
-                .hospitalPhoneNum(hospitalPhoneNum)
                 .build();
         hospitalRepository.save(hospital);
         return hospital.getId();

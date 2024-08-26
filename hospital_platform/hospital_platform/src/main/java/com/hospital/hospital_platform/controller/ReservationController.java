@@ -1,7 +1,9 @@
 package com.hospital.hospital_platform.controller;
 
 import com.hospital.hospital_platform.JwtTokenProvider;
+import com.hospital.hospital_platform.dto.HospitalDTO;
 import com.hospital.hospital_platform.dto.ReservationDTO;
+import com.hospital.hospital_platform.dto.ReservationRequestDTO;
 import com.hospital.hospital_platform.service.HospitalService;
 import com.hospital.hospital_platform.service.ReservationService;
 import jakarta.persistence.Id;
@@ -18,9 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-//form과 dto의 차이 form은 사용자로부터 데이터 수집 후 서비스 계층에 전달할때 사용
-//dto는 서비스 계층에서 처리된 데이터를 커트롤러로 반환하거나 외부시스템으로 데이터 전송때 사용
-//병원ID DB확인 후 있으면 가지고 오고 없으면 그냥 진행
 @RestController
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
@@ -32,15 +31,33 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationDTO> createReservation(
-            @Valid @RequestBody ReservationDTO reservationDTO,
+            @Valid @RequestBody ReservationRequestDTO requestDTO,
             @RequestHeader("Authorization") String token) {
 
-        if (!hospitalService.checkHospitalID(reservationDTO.getHospitalId())) {
-//            hospitalService.saveHospital(); //엄엄
+        if (token == null || token.isEmpty()) {
+            // 토큰이 없거나 비어있는 경우, 로그인 페이지로 리다이렉트
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header("Location", "/login")
+                    .build();
+        }
+
+        ReservationDTO reservationDTO = requestDTO.getReservationDTO();
+        HospitalDTO hospitalDTO = requestDTO.getHospitalDTO();
+
+        if (hospitalDTO.getId() == null) {
+            throw new IllegalArgumentException("Hospital ID must not be null");
+        }
+
+        if (!hospitalService.checkHospitalID(hospitalDTO.getId())) {
+            hospitalService.saveHospital(hospitalDTO.getId(), hospitalDTO.getName());
         }
 
         Long userId = getUserIdFromToken(token);
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID from token must not be null");
+        }
         reservationDTO.setUserId(userId);
+
         ReservationDTO createdReservation = reservationService.reservation(reservationDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
     }

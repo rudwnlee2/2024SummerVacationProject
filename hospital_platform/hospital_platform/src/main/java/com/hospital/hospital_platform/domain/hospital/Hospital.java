@@ -32,12 +32,10 @@ public class Hospital {
     private LocalDateTime closeTime;
 
     @Builder
-    public Hospital(Long id, String name, Address address, String hospitalPhoneNum) {
+    public Hospital(Long id, String name) {
 
         this.id = id;
         this.name = name;
-        this.address = address;
-        this.hospitalPhoneNum = hospitalPhoneNum;
     }
 
     @OneToMany(mappedBy = "hospital") //mappedBy를 안쓰면 단방향이 되버림
