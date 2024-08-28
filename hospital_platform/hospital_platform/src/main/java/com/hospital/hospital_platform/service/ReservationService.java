@@ -9,6 +9,8 @@ import com.hospital.hospital_platform.repository.HospitalRepository;
 import com.hospital.hospital_platform.repository.ReservationRepository;
 import com.hospital.hospital_platform.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
@@ -68,16 +72,37 @@ public class ReservationService {
      */
     @Transactional
     public ReservationDTO updateReservation(ReservationDTO reservationDTO) {
+        logger.info("Updating reservation. DTO: {}", reservationDTO);
+
+        if (reservationDTO.getId() == null) {
+            logger.error("Reservation ID is null");
+            throw new IllegalArgumentException("Reservation ID must not be null");
+        }
 
         Reservation reservation = reservationRepository.findById(reservationDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
-        Hospital hospital = hospitalRepository.findById(reservationDTO.getHospitalId())
-                .orElseThrow(() -> new IllegalArgumentException("Hospital not found"));
+                .orElseThrow(() -> {
+                    logger.error("Reservation not found with ID: {}", reservationDTO.getId());
+                    return new IllegalArgumentException("Reservation not found");
+                });
 
-        // 예약 시간 중복 체크 //동시성 문제가 생길 수 있음(나중에 시간되면 고쳐보도록(중복 체크와 예약 생성 논리를 데이터베이스 레벨에서 처리하는 것이 안전) 예) 낙관적 락
+        //reservation 여기서 병원엔티티를 가지고 와서 아이디를 조회
+        // 예약에서 병원 ID를 가져옵니다.
+        Long hospitalId = reservation.getHospital().getId();
+        logger.info("Retrieved hospital ID: {} from reservation", hospitalId);
+
+        Hospital hospital = hospitalRepository.findById(hospitalId)
+                .orElseThrow(() -> {
+                    logger.error("Hospital not found with ID: {}", hospitalId);
+                    return new IllegalArgumentException("Hospital not found");
+                });
+
+        logger.info("Checking for reservation conflicts...");
         checkHospitalReservationConflict(hospital.getId(), reservationDTO.getReservationDate());
 
+        logger.info("Updating reservation...");
         reservation.updateReservation(reservationDTO.getReservationDate());
+
+        logger.info("Reservation updated successfully. Updated reservation: {}", reservation);
         return ReservationDTO.fromEntity(reservation);
     }
 

@@ -4,8 +4,7 @@ import DatePicker from 'react-datepicker';
 
 function MyReservations() {
     const [reservations, setReservations] = useState([]);
-    const [editingId, setEditingId] = useState(null);
-    const [editDate, setEditDate] = useState(new Date());
+    const [editingReservation, setEditingReservation] = useState(null);
 
     useEffect(() => {
         fetchReservations();
@@ -21,15 +20,20 @@ function MyReservations() {
         }
     };
 
-    const handleEdit = (id, currentDate) => {
-        setEditingId(id);
-        setEditDate(new Date(currentDate));
+    const handleEdit = (reservation) => {
+        setEditingReservation({
+            ...reservation,
+            reservationDate: new Date(reservation.reservationDate)
+        });
     };
 
-    const handleUpdate = async (id) => {
+    const handleUpdate = async () => {
         try {
-            await updateReservation(id, { reservationDate: editDate.toISOString() });
-            setEditingId(null);
+            await updateReservation(editingReservation.id, {
+                reservationDate: editingReservation.reservationDate.toISOString(),
+                // 필요한 경우 다른 필드도 여기에 추가
+            });
+            setEditingReservation(null);
             fetchReservations();
             alert("예약이 수정되었습니다.");
         } catch (error) {
@@ -58,10 +62,10 @@ function MyReservations() {
                 <div key={reservation.id} className="reservation-item">
                     <p>병원: {reservation.hospitalName}</p>
                     <p>날짜: {
-                        editingId === reservation.id
+                        editingReservation?.id === reservation.id
                             ? <DatePicker
-                                selected={editDate}
-                                onChange={date => setEditDate(date)}
+                                selected={editingReservation.reservationDate}
+                                onChange={date => setEditingReservation({...editingReservation, reservationDate: date})}
                                 showTimeSelect
                                 dateFormat="yyyy/MM/dd h:mm aa"
                                 timeFormat="HH:mm"
@@ -70,10 +74,10 @@ function MyReservations() {
                             />
                             : new Date(reservation.reservationDate).toLocaleString()
                     }</p>
-                    {editingId === reservation.id ? (
-                        <button onClick={() => handleUpdate(reservation.id)}>수정 완료</button>
+                    {editingReservation?.id === reservation.id ? (
+                        <button onClick={handleUpdate}>수정 완료</button>
                     ) : (
-                        <button onClick={() => handleEdit(reservation.id, reservation.reservationDate)}>수정</button>
+                        <button onClick={() => handleEdit(reservation)}>수정</button>
                     )}
                     <button onClick={() => handleDelete(reservation.id)}>삭제</button>
                 </div>

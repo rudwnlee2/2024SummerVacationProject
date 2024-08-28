@@ -6,17 +6,12 @@ import com.hospital.hospital_platform.dto.ReservationDTO;
 import com.hospital.hospital_platform.dto.ReservationRequestDTO;
 import com.hospital.hospital_platform.service.HospitalService;
 import com.hospital.hospital_platform.service.ReservationService;
-import jakarta.persistence.Id;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,8 +73,19 @@ public class ReservationController {
             @PathVariable Long id,
             @Valid @RequestBody ReservationDTO reservationDTO,
             @RequestHeader("Authorization") String token) {
+
         Long userId = getUserIdFromToken(token);
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID from token must not be null");
+        }
+
+        if (id == null) {
+            throw new IllegalArgumentException("Reservation ID must not be null");
+        }
+
         reservationDTO.setId(id);
+        reservationDTO.setUserId(userId);
+
         ReservationDTO updatedReservation = reservationService.updateReservation(reservationDTO);
         return ResponseEntity.ok(updatedReservation);
     }
@@ -112,6 +118,5 @@ public class ReservationController {
         List<ReservationDTO> reservations = reservationService.findReservationsByUserId(userId);
         return ResponseEntity.ok(reservations);
     }
-
 
 }
