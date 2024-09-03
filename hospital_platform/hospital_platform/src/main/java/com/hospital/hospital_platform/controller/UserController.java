@@ -9,7 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor // 생성자 주입
 @RestController // JSON 반환
@@ -77,4 +79,27 @@ public class UserController {
         User user = userService.getAuthenticatedUser();
         return ResponseEntity.ok(user);
     }
+    
+    //마이페이지 사용자 정보 가지고오기
+    @GetMapping("/myPage")
+    public ResponseEntity<User> myPage(@RequestHeader("Authorization") String token) {
+        Long userId = getUserIdFromToken(token);
+        Optional<User> myInformation = userService.findOne(userId);
+        return myInformation
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    //토큰에서 유저아이디 가져오기
+    private Long getUserIdFromToken(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new IllegalArgumentException("Invalid or expired JWT token");
+        }
+        return jwtTokenProvider.getUserId(token);
+    }
+
+
 }

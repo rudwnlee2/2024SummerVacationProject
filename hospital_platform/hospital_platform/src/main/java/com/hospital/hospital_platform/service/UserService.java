@@ -76,4 +76,9 @@ public class UserService {
         Optional<User> user = userRepository.findById(Long.parseLong(userId));
         return user.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     }
+
+    public Optional<User> findOne(Long userId) {
+        return userRepository.findById(userId);
+    }
+
 }

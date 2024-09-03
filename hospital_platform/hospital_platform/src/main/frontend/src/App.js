@@ -16,6 +16,7 @@ import ReservationSystem from './components/ReservationSystem';
 import ReservationList from "./components/ReservationList";
 import ReservationForm from "./components/ReservationForm";  // 새로 추가
 import MyReservations from './components/MyReservations';
+import MyPage from './components/MyPage'; // MyPage 컴포넌트 import
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                 <div className="login-button">
                     <Link to="/Login">Login</Link>
                     <Link to="/my-reservations">내 예약 목록</Link>
+                    <Link to="/my-page">My Page</Link> {/* MyPage 링크 추가 */}
                 </div>
             </header>
 
@@ -57,6 +59,7 @@ function App() {
                 <Route path="/ReservationForm" element={<ReservationForm />} />
                 <Route path="*" element={<Navigate to="/" />} />
                 <Route path="/my-reservations" element={<MyReservations />} />
+                <Route path="/my-page" element={<MyPage />} /> {/* MyPage 라우트 추가 */}
             </Routes>
         </div>
     );
