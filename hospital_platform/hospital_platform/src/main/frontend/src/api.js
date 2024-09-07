@@ -61,3 +61,21 @@ export const getMyReservations = async () => {
         throw error;
     }
 };
+
+// MyPage 데이터를 가져오는 함수 추가
+export const fetchMyPageData = async () => {
+    const token = localStorage.getItem('token');
+    console.log('Token:', token); // 토큰 로깅
+    try {
+        const response = await axios.get('/myPage', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        console.log('API Response:', response); // 응답 로깅
+        return response;
+    } catch (error) {
+        console.error('API Error:', error.response || error); // 에러 로깅
+        throw error;
+    }
+};

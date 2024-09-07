@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchMyPageData } from '../api'; // api.js에서 함수 임포트
 import axios from 'axios';
 
 const MyPage = () => {
@@ -10,24 +11,19 @@ const MyPage = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('authToken'); // 토큰을 로컬 스토리지에서 가져옴
-                if (!token) {
-                    navigate('/login'); // 토큰이 없으면 로그인 페이지로 리다이렉트
-                    return;
-                }
-
-                const response = await axios.get('/MyPage', {
-                    headers: {
-                        'Authorization': token
-                    }
-                });
-
-                console.log('User Data:', response.data); // 사용자 데이터 확인
+                console.log('Fetching user data...'); // 요청 시작 로깅
+                const response = await fetchMyPageData();
+                console.log('User data received:', response.data); // 받은 데이터 로깅
                 setUser(response.data);
             } catch (err) {
-                console.error('Error fetching user data:', err); // 에러 확인
-                setError('Failed to fetch user data');
-                navigate('/login'); // 실패 시 로그인 페이지로 리다이렉트
+                console.error('Error in fetchUserData:', err.response || err); // 상세 에러 로깅
+                console.error('Error details:', err.response || err);
+                if (err.response && err.response.status === 401) {
+                    setError('Session expired. Please login again.');
+                    setTimeout(() => navigate('/login'), 3000);
+                } else {
+                    setError('Failed to fetch user data. Please try again later.');
+                }
             }
         };
 
@@ -41,12 +37,10 @@ const MyPage = () => {
         <div>
             <h1>My Page</h1>
             <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>password:</strong> {user.password}</p>
             <p><strong>Username:</strong> {user.name}</p>
-            <p><strong>nickname:</strong> {user.nickname}</p>
-            <p><strong>phoneNum:</strong> {user.phoneNum}</p>
+            <p><strong>Nickname:</strong> {user.nickname}</p>
+            <p><strong>Phone Number:</strong> {user.phoneNum}</p>
             <p><strong>Address:</strong> {user.address}</p>
-            {/* 다른 사용자 정보도 여기 추가 */}
         </div>
     );
 };
