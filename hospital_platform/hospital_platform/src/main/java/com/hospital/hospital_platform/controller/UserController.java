@@ -4,8 +4,10 @@ import com.hospital.hospital_platform.JwtTokenProvider;
 import com.hospital.hospital_platform.domain.User;
 import com.hospital.hospital_platform.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -79,18 +81,27 @@ public class UserController {
         User user = userService.getAuthenticatedUser();
         return ResponseEntity.ok(user);
     }
-    
-    //마이페이지 사용자 정보 가지고오기
+
     @GetMapping("/myPage")
-    public ResponseEntity<User> myPage(@RequestHeader("Authorization") String token) {
-        Long userId = getUserIdFromToken(token);
-        Optional<User> myInformation = userService.findOne(userId);
-        return myInformation
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> myPage(@RequestHeader("Authorization") String token) {
+        try {
+            Long userId = getUserIdFromToken(token);
+            User myInformation = userService.findOne(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("name", myInformation.getName());
+            response.put("email", myInformation.getEmail());
+            response.put("phoneNumber", myInformation.getPhoneNum());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
-    //토큰에서 유저아이디 가져오기
     private Long getUserIdFromToken(String token) {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);

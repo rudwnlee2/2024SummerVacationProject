@@ -67,7 +67,7 @@ export const fetchMyPageData = async () => {
     const token = localStorage.getItem('token');
     console.log('Token:', token); // 토큰 로깅
     try {
-        const response = await axios.get('/myPage', {
+        const response = await axios.get('/api/myPage', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
